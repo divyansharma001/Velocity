@@ -1,6 +1,6 @@
 use std::error;
 use::std::net::TcpListener;
-use::std::io::Read;
+use::std::io::{Read, Write};
 
 fn main(){
 
@@ -42,6 +42,17 @@ fn main(){
         };
 
         println!("Recieved {} bytes", bytes_read);
+
+      match stream.write_all(&buffer[..bytes_read]) {
+            Ok(()) => {
+                println!("Response sent");
+            }
+
+            Err(error) => {
+                eprintln!("Failed to write to the client: {}", error);
+                continue;
+            }
+        };
 
     }
 }
