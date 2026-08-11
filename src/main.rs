@@ -27,17 +27,19 @@ fn main(){
 
         let mut buffer = [0u8; 1024];
 
+        loop{
+
         let bytes_read = match stream.read(&mut buffer){
             Ok(0) => {
                 println!("Client Disconnected");
-                continue;
+                 break;
             },
 
             Ok(bytes) => bytes,
 
             Err(error) => {
                 eprintln!("Failed to read from the client: {}", {error});
-                continue;
+                break;
             }
         };
 
@@ -50,9 +52,11 @@ fn main(){
 
             Err(error) => {
                 eprintln!("Failed to write to the client: {}", error);
-                continue;
+                break;
             }
         };
+
+    }
 
     }
 }
