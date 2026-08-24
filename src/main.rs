@@ -1,8 +1,12 @@
+mod resp;
 use std::error;
 use::std::net::TcpListener;
 use::std::io::{Read, Write};
 
 fn main(){
+
+    let response = resp::ping();
+    println!("{:?}", response);
 
     let listener = match TcpListener::bind("127.0.0.1:6379"){
         Ok(listener) => listener,
@@ -44,6 +48,7 @@ fn main(){
         };
 
         println!("Recieved {} bytes", bytes_read);
+        println!("Raw bytes: {:?}", &buffer[..bytes_read]);
 
       match stream.write_all(&buffer[..bytes_read]) {
             Ok(()) => {
