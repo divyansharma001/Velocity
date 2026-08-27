@@ -18,6 +18,9 @@ pub fn encode_bulk_string(value: &[u8]) -> Vec<u8> {
         value.len().to_string().as_bytes()
     );
     encoded.extend_from_slice(b"\r\n");
+    encoded.extend_from_slice(value);
+    encoded.extend_from_slice(b"\r\n");
+    
 
     encoded
 }

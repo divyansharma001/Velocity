@@ -5,9 +5,9 @@ use::std::io::{Read, Write};
 
 fn main(){
 
-    let response = resp::ping();
-    println!("{:?}", response);
-
+    let encoded = resp::encode_bulk_string(b"PING");
+    println!("{:?}", encoded);
+    
     let listener = match TcpListener::bind("127.0.0.1:6379"){
         Ok(listener) => listener,
         Err(error) => {
