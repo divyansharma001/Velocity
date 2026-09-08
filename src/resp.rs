@@ -52,11 +52,12 @@ pub fn parse(data : &[u8]) {
     match first_byte {
 
         b'*' => {
-             let count_byte = data[1];
-             let count = (count_byte-b'0') as usize;
-                println!("This is an Array");
-
-                println!("Count byte: {}", count);
+            
+            let position = data
+                                            .windows(2)
+                                            .position(|window| window==b"\r\n");
+                            
+            println!("CRLF position: {:?}", position);
 
         }
 
