@@ -57,7 +57,33 @@ pub fn parse(data : &[u8]) {
                                             .windows(2)
                                             .position(|window| window==b"\r\n");
                             
-            println!("CRLF position: {:?}", position);
+            match position {
+                Some(position) => {
+                    let count_bytes = &data[1..position];
+
+                    let count_string = match std::str::from_utf8(count_bytes){
+                        Ok(value) => value,
+                        Err(error) => {
+                            println!("Invalid UTF-8: {}", error);
+                            return;
+                        }
+                    };
+
+                    let count = match count_string.parse::<usize>() {
+                        Ok(value) => value,
+                        Err(error) => {
+                            println!("Invalid array count: {}", error);
+                            return;
+                        }
+                    };
+
+                    println!("Array count: {}", count);
+                }
+
+                None =>{
+                     println!("CRLF not found");
+                }
+            }
 
         }
 
