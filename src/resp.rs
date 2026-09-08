@@ -60,6 +60,10 @@ pub fn parse(data : &[u8]) {
             match position {
                 Some(position) => {
                     let count_bytes = &data[1..position];
+                    let bulk_start = position+2;
+
+                    println!("Bulk starts at index: {}", bulk_start);
+                    println!("Bulk type byte: {:?}", data[bulk_start]);
 
                     let count_string = match std::str::from_utf8(count_bytes){
                         Ok(value) => value,
