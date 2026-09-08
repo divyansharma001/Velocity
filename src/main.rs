@@ -1,12 +1,13 @@
 mod resp;
-use std::error;
-use::std::net::TcpListener;
-use::std::io::{Read, Write};
+use std::net::TcpListener;
+use std::io::{Read, Write};
 
 fn main(){
 
-    let encoded = resp::encode_bulk_string(b"PING");
-    println!("{:?}", encoded);
+    let data = b"*1\r\n$4\r\nPING\r\n";
+
+    resp::parse(data);
+
     
     let listener = match TcpListener::bind("127.0.0.1:6379"){
         Ok(listener) => listener,
@@ -42,7 +43,7 @@ fn main(){
             Ok(bytes) => bytes,
 
             Err(error) => {
-                eprintln!("Failed to read from the client: {}", {error});
+                eprintln!("Failed to read from the client: {}", error);
                 break;
             }
         };

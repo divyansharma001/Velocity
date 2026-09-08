@@ -36,11 +36,32 @@ pub fn encode_array(values: &[RespValue]) -> Vec<u8> {
                 let bulk_string = encode_bulk_string(data);
                 encoded.extend_from_slice(&bulk_string);
             }
-            RespValue::Array(_)=>{
-                
+            RespValue::Array(values)=>{
+                let array = encode_array(values);
+                encoded.extend_from_slice(&array);
             }
         }
     }
 
     encoded
+}
+
+pub fn parse(data : &[u8]) {
+    let first_byte = data[0];
+
+    match first_byte {
+
+        b'*' => {
+            println!("This is an array");
+        }
+
+        b'$' => {
+            println!("This is a bulk string");
+        }
+
+        _ => {
+            println!("Unknown RESP type");
+        }
+
+    }
 }
