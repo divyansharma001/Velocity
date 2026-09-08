@@ -52,7 +52,12 @@ pub fn parse(data : &[u8]) {
     match first_byte {
 
         b'*' => {
-            println!("This is an array");
+             let count_byte = data[1];
+             let count = (count_byte-b'0') as usize;
+                println!("This is an Array");
+
+                println!("Count byte: {}", count);
+
         }
 
         b'$' => {
