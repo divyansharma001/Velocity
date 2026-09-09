@@ -60,10 +60,26 @@ pub fn parse(data : &[u8]) {
             match position {
                 Some(position) => {
                     let count_bytes = &data[1..position];
+
                     let bulk_start = position+2;
 
                     println!("Bulk starts at index: {}", bulk_start);
                     println!("Bulk type byte: {:?}", data[bulk_start]);
+
+                    let bulk_length_end = data[bulk_start..]
+                                              .windows(2)
+                                              .position(|window| window == b"\r\n" );
+
+                    match bulk_length_end {
+                          Some(length_end) => {
+                            let length_bytes = &data[bulk_start+1..bulk_start+length_end];
+                            println!("Bulk length bytes: {:?}", length_bytes);
+                          }
+
+                          None => {
+                            println!("Bulk length CRLF not found");
+                          }
+                    };
 
                     let count_string = match std::str::from_utf8(count_bytes){
                         Ok(value) => value,
