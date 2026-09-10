@@ -73,7 +73,29 @@ pub fn parse(data : &[u8]) {
                     match bulk_length_end {
                           Some(length_end) => {
                             let length_bytes = &data[bulk_start+1..bulk_start+length_end];
-                            println!("Bulk length bytes: {:?}", length_bytes);
+                            let length_string = match std::str::from_utf8(length_bytes) {
+                                Ok(value) => value,
+                                Err(error) => {
+                                    println!("Invalid UTF-8: {}", error);
+                                    return;
+                                }
+                            };
+
+                            println!("Bulk length string: {}", length_string);
+
+                            let length = match length_string.parse::<usize>(){
+                                Ok(value) => value,
+                                Err(error) => {
+                                    println!("Invalid bulk string length {:?}", error);
+                                    return;
+                                }
+                            };
+
+                            println!("Bulk string length: {}", length);
+
+                            let data_start = bulk_start + length_end + 2;
+
+                            println!("Data starts at index: {}", data_start);
                           }
 
                           None => {
