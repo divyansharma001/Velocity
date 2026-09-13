@@ -49,6 +49,10 @@ pub fn encode_array(values: &[RespValue]) -> Vec<u8> {
     encoded
 }
 
+fn parse_bulk_string(data : &[u8], start: usize) -> Result<(RespValue, usize), String> {
+    todo!()
+}
+
 pub fn parse(data : &[u8]) -> Result<RespValue, String> {
     let first_byte = data[0];
 
