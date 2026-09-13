@@ -1,3 +1,6 @@
+use core::error;
+use std::os::unix::fs::PermissionsExt;
+
 #[derive(Debug)]
 pub enum RespValue{
     BulkString(Vec<u8>),
@@ -46,7 +49,7 @@ pub fn encode_array(values: &[RespValue]) -> Vec<u8> {
     encoded
 }
 
-pub fn parse(data : &[u8]) {
+pub fn parse(data : &[u8]) -> Result<RespValue, String> {
     let first_byte = data[0];
 
     match first_byte {
@@ -60,6 +63,22 @@ pub fn parse(data : &[u8]) {
             match position {
                 Some(position) => {
                     let count_bytes = &data[1..position];
+
+                    let count_string = match std::str::from_utf8(count_bytes){
+                        Ok(value) => value,
+                        Err(error) => {
+                            return Err(error.to_string());
+                        }
+                    };
+
+                    let count = match count_string.parse::<usize>(){
+                        Ok(value) => value,
+                        Err(error) =>{
+                            return Err(error.to_string());
+                        }
+                    };
+
+                    println!("Array count: {}", count);
 
                     let bulk_start = position+2;
 
@@ -77,7 +96,7 @@ pub fn parse(data : &[u8]) {
                                 Ok(value) => value,
                                 Err(error) => {
                                     println!("Invalid UTF-8: {}", error);
-                                    return;
+                                    return Err(error.to_string());
                                 }
                             };
 
@@ -87,7 +106,7 @@ pub fn parse(data : &[u8]) {
                                 Ok(value) => value,
                                 Err(error) => {
                                     println!("Invalid bulk string length {:?}", error);
-                                    return;
+                                    return Err(error.to_string());
                                 }
                             };
 
@@ -96,34 +115,32 @@ pub fn parse(data : &[u8]) {
                             let data_start = bulk_start + length_end + 2;
 
                             println!("Data starts at index: {}", data_start);
+
+                            let bulk_data = &data[data_start..data_start+length];
+
+                            println!("Bulk data: {:?}", bulk_data);
+
+                            let bulk_string = RespValue::BulkString(bulk_data.to_vec());
+
+                            println!("BulkString: {:?}", bulk_string);
+
+                            let array = RespValue::Array(vec![bulk_string]);
+
+                            return Ok(array);
+
                           }
 
                           None => {
                             println!("Bulk length CRLF not found");
+                            return Err("Bulk length CRLF not found".to_string());
                           }
-                    };
-
-                    let count_string = match std::str::from_utf8(count_bytes){
-                        Ok(value) => value,
-                        Err(error) => {
-                            println!("Invalid UTF-8: {}", error);
-                            return;
                         }
-                    };
 
-                    let count = match count_string.parse::<usize>() {
-                        Ok(value) => value,
-                        Err(error) => {
-                            println!("Invalid array count: {}", error);
-                            return;
-                        }
-                    };
-
-                    println!("Array count: {}", count);
                 }
 
                 None =>{
                      println!("CRLF not found");
+                     return Err("CRLF not found".to_string());
                 }
             }
 
@@ -131,10 +148,12 @@ pub fn parse(data : &[u8]) {
 
         b'$' => {
             println!("This is a bulk string");
+            return Err("Top-level bulk strings are not supported yet".to_string());
         }
 
         _ => {
             println!("Unknown RESP type");
+            return Err("Unknown RESP type".to_string());
         }
 
     }
