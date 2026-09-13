@@ -120,6 +120,10 @@ pub fn parse(data : &[u8]) -> Result<RespValue, String> {
 
                             println!("Bulk data: {:?}", bulk_data);
 
+                            let next_position = data_start+length+2;
+
+                            println!("Next position: {}", next_position);
+
                             let bulk_string = RespValue::BulkString(bulk_data.to_vec());
 
                             println!("BulkString: {:?}", bulk_string);
